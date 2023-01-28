@@ -1,0 +1,35 @@
+version: "3.9"
+services:
+  web:
+    container_name: web
+    build: .
+    ports:
+      - "5000:80"
+    volumes:
+      - $PWD:/var/www/html/
+    environment:
+      XDEBUG_MODE: debug
+      XDEBUG_CONFIG: client_host=host.docker.internal client_port=9003
+
+  db:
+    container_name: db
+    build:
+      context: .
+      dockerfile: "db.Dockerfile"
+    ports:
+      - 3306:3306
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: "TRUE"
+  
+  phpmyadmin:
+    container_name: phpmyadmin
+    image: phpmyadmin
+    restart: always
+    links:
+      - db
+    ports:
+      - 8080:80
+    environment:
+       PMA_HOST: db
+       PMA_PORT: 3306
+       PMA_ARBITRARY: 1
